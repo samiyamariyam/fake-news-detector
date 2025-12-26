@@ -1,0 +1,147 @@
+{
+  "name": "fake news detector",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fake news ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "68154ec2-06fb-41e5-9eb1-2be2654e710a",
+      "name": "Webhook",
+      "webhookId": "bcb44f3d-d9a0-41f4-8034-6ce25d8f8245"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9f81ecad-8a25-4741-bd43-0d8a3ce6481c",
+              "name": "news ",
+              "value": "={{$json[\"news\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        16
+      ],
+      "id": "e16f1ea7-f367-44e0-9382-1b22db14d864",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type ",
+              "value": "applications/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "JSON",
+              "value": "={   \"contents\": [     {       \"parts\": [         {           \"text\": \"Check if the following news is fake or real. Give result, score (0-100), and short reason:\\n\\n{{$json.news}}\"         }       ]     }   ] }"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        288,
+        32
+      ],
+      "id": "ef4be0ba-7022-4d78-8219-1f3da4fa9d2f",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        416,
+        -64
+      ],
+      "id": "dda47d3c-3e35-4bd9-a575-6122e90973d6",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "999afde9-3fe5-4ab8-8c07-592c4a175e8a",
+  "meta": {
+    "instanceId": "9ca99a50e2c14407db45edfe6b5e27f6d99ddab4a8eacec73056b785a3134d18"
+  },
+  "id": "U5MVdjxIp3qAsZBw",
+  "tags": []
+}
